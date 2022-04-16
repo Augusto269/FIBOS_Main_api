@@ -19,13 +19,6 @@ services:
     ports:
       - 8000:8000
       - 9229:9229
-  mongodb:
-      image: 'mongo'
-      ports:
-        - "27017:27017"
-      restart: always
-      volumes:
-        - ./mongo-data:/data/db
 
   postgres:
     image: postgres:10.4
