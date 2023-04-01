@@ -1,6 +1,6 @@
 FROM node:14 AS development
 
-WORKDIR /nestJs/src/app
+WORKDIR /src/app
 
 COPY package*.json ./
 
@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD [ "npm", "run","start:dev" ]
+CMD [ "npm", "run" ]

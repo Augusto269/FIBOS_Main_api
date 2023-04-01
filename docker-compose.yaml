@@ -1,31 +1,73 @@
 version: "3.8"
+
 services:
   api:
     build:
       dockerfile: Dockerfile
       context: .
-      target: development
     volumes:
       - .:/nestJs/src/app
       - ./nestJs/src/app/node_modules
+      - type: bind
+        source: ./node_modules
+        target: /nestJs/src/app/node_modules
     command: npm run start:dev
-    depends_on: 
+    depends_on:
       - postgres
-    environment: 
+      - mongodb
+    environment:
       DATABASE_URL: postgres://user:password@postgres:5432/db
       NODE_ENV: development
       JWT_SECRET: SecretPassword123
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: root
+      MONGODB_PASS: example_password
+      MONGODB_AUTH_DB: admin
+      MONGO_URI: mongodb://mongodb:27017/nestjs
       PORT: 8000
     ports:
-      - 8000:8000
-      - 9229:9229
+      - "8000:8000"
+      - "9229:9229"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8000/ || exit 1"]
+      interval: 15000s
+      timeout: 10s
+      retries: 5
 
   postgres:
     image: postgres:10.4
-    environment: 
+    environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: db
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
     ports:
-      - 8080:5432
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 15000s
+      timeout: 10s
+      retries: 5
 
+  mongodb:
+    image: mongo:4.4
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example_password
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD-SHELL", "mongo --eval 'db.runCommand({ connectionStatus: 1 })'"]
+      interval: 300000s
+      timeout: 100s
+      retries: 5
+
+volumes:
+  mongodb-data:
+  postgresql-data:
