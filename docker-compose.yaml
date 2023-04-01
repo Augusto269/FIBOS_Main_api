@@ -55,9 +55,6 @@ services:
     image: mongo:4.4
     container_name: mongodb
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example_password
     volumes:
       - mongodb-data:/data/db
     ports:
